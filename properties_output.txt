@@ -1,0 +1,53 @@
+
+----------------------BALANCEDNESS PROPERTY-------------------------
+
+For Y[0] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[1] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[2] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[3] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[4] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[5] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[6] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+
+For Y[7] numbers of zero(c0)= 128 and numbers of ones(c1)= 128 
+BALANCED
+
+
+----------------------SAC PROPERTY-------------------------
+
+Number of elements satisfying SAC=  152
+
+Percentage =  59 %
+
+----------------------NON LINEARITY PROPERTY-------------------------
+
+For Y[0] min_hd=114
+
+For Y[1] min_hd=128
+
+For Y[2] min_hd=128
+
+For Y[3] min_hd=128
+
+For Y[4] min_hd=128
+
+For Y[5] min_hd=128
+
+For Y[6] min_hd=128
+
+For Y[7] min_hd=128
+-----------------------ALGEBRAIC DEGREE-----------------------------
+Degree of y[0] = 8
+Degree of y[1] = 8
+Degree of y[2] = 0
+Degree of y[3] = 8
+Degree of y[4] = 0
+Degree of y[5] = 8
+Degree of y[6] = 0
+Degree of y[7] = 0

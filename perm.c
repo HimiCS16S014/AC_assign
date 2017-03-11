@@ -1,8 +1,7 @@
-
 #include<stdio.h>
 #include<math.h>
 #include<stdlib.h>
-#include<stdint.h>
+#include <stdint.h>
 
 #define keysize 64
 #define nbytes keysize/8
@@ -10,8 +9,6 @@
 #define row sqrt(nbytes)
 #define ROTL16(x,shift) ((uint16_t) ((x) << (shift)) | ((x) >> (16 - (shift))))
 #define ROTR16(x,shift) ((uint16_t) ((x) >> (shift)) | ((x) << (16 - (shift))))
-
-
 
 
 static const uint8_t sbox[256] = {0x2b, 0xf6, 0x62, 0x95, 0x18, 0xe4, 0x38, 0x8b, 0x3b, 0xe2, 0xf, 0x1a, 0x4b, 0xc8, 0xb5, 0x87, 0x23, 0x32, 0x58, 
@@ -32,58 +29,57 @@ static uint8_t key[6][8] = {{0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6d, 0x79}, {0
  {0x76, 0x43, 0x55, 0x69, 0xa0, 0x3a, 0xf7, 0xfa}};
  
 uint8_t pt[128] = {0x54 , 0x77, 0x6F , 0x20, 0x4F, 0x6E, 0x65, 0x20, 0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F};
-uint8_t pt1[128] = {0x54 , 0x77, 0x6F , 0x20, 0x4E, 0x6E, 0x65, 0x20, 0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F};
+uint8_t segment[nbytes],segment_l[nbytes/2],segment_r[nbytes/2],state_temp[nbytes],segment_temp[nbytes]; //, 0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F};
 
-uint8_t segment_1[nbytes],segment_1_l[nbytes/2],segment_1_r[128],state_temp[nbytes],segment_1_temp[nbytes] ;
-uint8_t segment[nbytes],segment_l[nbytes/2],segment_r[128],state_temp[nbytes],segment_temp[nbytes]; 
-double bias;//, 0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F};
-
-void init_pt()
+init_pt()
 {
 	size_t i=0 ,j=0, k;
-	for(k=0;k<16;k++)
-	{
-		segment_r[k]=pt[k];
-		segment_1_r[k]=pt1[k];
-	}
 	for(k=0;k<nbytes/2;k++)
 	{
-		
+		segment_temp[k]=pt[k];
 		segment[k]=pt[k+4];
 		segment[k+4]=pt[k+8];
-		segment_1[k]=pt1[k+4];
-		segment_1[k+4]=pt1[k+8];
-		
+		segment_temp[k+12]=pt[k+12];
+
 	}
 
 }
 
 
-uint8_t SubstituteByte(uint8_t x)
+int AddroundKey(int rn)
 {
-	return (sbox[x]);
+	
+	size_t i,j,k;
+
+	for(i=0;i<nbytes;i++)
+	{
+		segment[i]=segment[i] ^ key[rn][i];
+	}
+
+	
 }
 
 
 
 
 
-void SubByte(uint8_t *in, uint8_t *out)
+
+
+SubByte()
 {
 	size_t i,j;
 	for(i=0;i<nbytes;i++)
 	{
-		in[i]=segment[i]^segment_1[i];
-
-		segment_1[i]= SubstituteByte(segment_1[i]);
-		segment[i]= SubstituteByte(segment[i]);
-
-		out[i]=segment[i]^segment_1[i];
+			segment[i]= SubstituteByte(segment[i]);
 	}
 	
 }
 
 
+SubstituteByte(int x)
+{
+	return (sbox[x]);
+}
 
 
 
@@ -117,16 +113,16 @@ uint8_t f4(uint8_t s1, uint8_t s2)
 	return c;
 }
 
-void perm(uint8_t *seg)
+perm()
 {
 	
 	int i,j,k;
 	uint8_t a1,a2,a3,a4,b1,b2,c1,temp[nbytes];
 	uint16_t t1,t2,t3,t4;
-	a1= f1(seg[0], seg[2]);
-	a2= f2(seg[1], seg[4]);
-	a3= f3(seg[3], seg[6]);
-	a4= f4(seg[5], seg[7]);
+	a1= f1(segment[0], segment[2]);
+	a2= f2(segment[1], segment[4]);
+	a3= f3(segment[3], segment[6]);
+	a4= f4(segment[5], segment[7]);
 	b1= f2(a1,a2);
 	b2= f3(a3,a4);
 	c1= f1(b1,b2);
@@ -159,7 +155,7 @@ void perm(uint8_t *seg)
 
 	for(i=0; i<nbytes;i++)
 	{
-		seg[i]=temp[i];
+		segment[i]=temp[i];
 	}
 
 	/*printf("\nt1=%d\n",t1 );
@@ -180,121 +176,41 @@ void perm(uint8_t *seg)
 
 }
 
-void fiestel_xor()
+fiestel_xor()
 {
 	int i,j;
 	for(i=0;i<nbytes;i++)
 	{
 		if(i<4)
 		{
-			segment_1[i]= segment_1[i] ^ segment_1_r[i];
+			segment[i]= segment[i] ^ segment_l[i];
 		}
 		else
-			segment_1[i]= segment_1[i] ^ segment_1_r[i+12];
-		
-	}
-
-	for(i=0;i<nbytes;i++)
-	{
-		if(i<4)
-		{
 			segment[i]= segment[i] ^ segment_r[i];
-		}
-		else
-			segment[i]= segment[i] ^ segment_r[i+12];
 		
 	}
 }
 
-void store()
+fiestel_func(int r)
 {
-	int i,j,k;
-	for(i=0;i<nbytes/2;i++)
-	{
-		segment_1_r[i]=segment_1_r[i+4];
-		segment_1_r[i+12]=segment_1_r[i+8];
-	}
-	for(i=0;i<nbytes;i++)
-	{
-		segment_1_r[i+4]=segment_1[i];
-	}
-
-	for(i=0;i<nbytes/2;i++)
-	{
-		segment_r[i]=segment_r[i+4];
-		segment_r[i+12]=segment_r[i+8];
-	}
-	for(i=0;i<nbytes;i++)
-	{
-		segment_r[i+4]=segment[i];
-	}
-
+	AddroundKey(r);	
+	SubByte();
+	perm();
 }
 
-void fiestel_func(int r)
-{
-	uint8_t input_xor[nbytes], output_xor[nbytes];
-	int i;
-	 
-	 SubByte(input_xor, output_xor);
-
-	printf("\nPrinting in:\n");
-	for(i=0;i<nbytes;i++)
-	{
-
-		printf("%x\t",input_xor[i] );
-	}
-	printf("\n");
-
-
-	printf("\nPrinting out:\n");
-	for(i=0;i<nbytes;i++)
-	{
-
-		printf("%x\t",output_xor[i] );
-	}
-	printf("\n");
-
-	 perm(segment);
-	 perm(segment_1);
-}
-
-
-void print_segment_1()
-{
-	int i,j;
-	printf("\nPrinting segment_1:\n");
-	for(i=0;i<nbytes*2;i++)
-	{
-
-		printf("%x\t",segment_1_r[i] );
-	}
-	printf("\n");
-}
-
-void encryption()
-{
-	int r=0;
-
-	 fiestel_func(r);
-	 fiestel_xor();
-	 store();
-}
 
 int main()
 {
 
 	uint8_t res;
-	
-	 init_pt();
-	 print_segment_1();
-	 encryption();
-	
-	
-	 print_segment_1();
+	int r=0;
+
+	init_pt();
+	fiestel_func(r);
+	fiestel_xor();
 
 
 	
-	return 0;
+	
 
 }
